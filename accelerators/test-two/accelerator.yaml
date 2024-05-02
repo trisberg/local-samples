@@ -1,0 +1,13 @@
+accelerator:
+  displayName: Test One!
+  description: A simple test
+  iconUrl: https://raw.githubusercontent.com/sample-accelerators/icons/master/icon-cloud.png
+  tags:
+  - tanzu
+
+  # options for the UI
+  options:
+  - name: comment
+    inputType: text
+    label: A Test Comment
+    defaultValue: Foo Bar

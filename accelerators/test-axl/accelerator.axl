@@ -1,0 +1,28 @@
+engine {
+  let bsGitRepository = 'github.com?owner=trisberg&repo=my-repo' in
+  let bsGitBranch = 'test' in
+  let workloadResourceName = #artifactId.toLowerCase() in {
+    applyTo("config/workload.yaml") {
+      ReplaceText({{"test-axl", #workloadResourceName}})
+    }
+    applyTo("README.md") {
+      ReplaceText({{text: "Hello", with: #comment}})
+    }
+    applyTo("LICENSE") {
+      ReplaceText({{"2022","2022-2024"}})
+    }
+    applyTo("src/test.txt") {
+      ReplaceText(regex: {pattern: "(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})", with: '${month}/${day}/${year}'})
+    }
+    UniquePath(UseLast)
+  }
+  
+  {
+    Include({'**'})
+    + InvokeFragment('tap-workload')
+  }
+  UniquePath(UseLast)
+  
+  Provenance()
+
+}

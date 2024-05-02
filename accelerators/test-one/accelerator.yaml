@@ -1,0 +1,58 @@
+accelerator:
+  displayName: Test One!
+  description: A simple test
+  iconUrl: https://raw.githubusercontent.com/sample-accelerators/icons/master/icon-cloud.png
+  tags:
+  - tanzu
+
+  # options for the UI
+  options:
+  - name: comment
+    inputType: text
+    label: A Test Comment
+    defaultValue: Foo Bar
+
+  imports:
+  - name: tap-workload
+
+engine:
+  let:
+    - name: mycomment
+      expression: "#comment"
+    - name: bsGitRepository
+      expression: "'github.com?owner=trisberg&repo=my-repo'"
+    - name: bsGitBranch
+      expression: "'test'"
+  merge:
+    - chain:
+      - include: [ "**" ]
+      - applyTo: [ "README.*" ]
+        transformations:
+        - type: ReplaceText
+          substitutions:
+          - text: "Hello"
+            with: "#mycomment"
+      - applyTo: [ "LICENSE" ]
+        transformations:
+          - type: ReplaceText
+            substitutions:
+            - text: "2022"
+              with: "'2022-2024'"
+      - applyTo: [ "src/test.txt" ]
+        transformations:
+          - type: ReplaceText
+            regex:
+              pattern: "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})"
+              with: "'${month}/${day}/${year}'"
+      - type: Provenance
+    - include: [ "config/workload.yaml" ]
+      chain:
+      - type: ReplaceText
+        substitutions:
+        - text: test-one
+          with: "#artifactId"
+      - merge:
+          - type: InvokeFragment
+            reference: tap-workload
+          - include: [ "**" ]
+        onConflict: UseFirst
